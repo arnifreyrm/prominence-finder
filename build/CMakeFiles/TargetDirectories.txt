@@ -1,3 +1,9 @@
 /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles/PeakFinder.dir
 /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles/edit_cache.dir
 /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles/rebuild_cache.dir
+/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/src/visualization/CMakeFiles/VisualizationLib.dir
+/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/src/visualization/CMakeFiles/edit_cache.dir
+/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/src/visualization/CMakeFiles/rebuild_cache.dir
+/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/src/computation/CMakeFiles/ComputationLib.dir
+/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/src/computation/CMakeFiles/edit_cache.dir
+/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/src/computation/CMakeFiles/rebuild_cache.dir

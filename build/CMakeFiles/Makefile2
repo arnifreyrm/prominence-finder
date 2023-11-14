@@ -64,29 +64,65 @@ CMAKE_BINARY_DIR = /Users/arni/Documents/Columbia/Fall2023/Design/prominence-fin
 
 # The main recursive "all" target.
 all: CMakeFiles/PeakFinder.dir/all
+all: src/visualization/all
+all: src/computation/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
-preinstall:
+preinstall: src/visualization/preinstall
+preinstall: src/computation/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
 clean: CMakeFiles/PeakFinder.dir/clean
+clean: src/visualization/clean
+clean: src/computation/clean
 .PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/computation
+
+# Recursive "all" directory target.
+src/computation/all: src/computation/CMakeFiles/ComputationLib.dir/all
+.PHONY : src/computation/all
+
+# Recursive "preinstall" directory target.
+src/computation/preinstall:
+.PHONY : src/computation/preinstall
+
+# Recursive "clean" directory target.
+src/computation/clean: src/computation/CMakeFiles/ComputationLib.dir/clean
+.PHONY : src/computation/clean
+
+#=============================================================================
+# Directory level rules for directory src/visualization
+
+# Recursive "all" directory target.
+src/visualization/all: src/visualization/CMakeFiles/VisualizationLib.dir/all
+.PHONY : src/visualization/all
+
+# Recursive "preinstall" directory target.
+src/visualization/preinstall:
+.PHONY : src/visualization/preinstall
+
+# Recursive "clean" directory target.
+src/visualization/clean: src/visualization/CMakeFiles/VisualizationLib.dir/clean
+.PHONY : src/visualization/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/PeakFinder.dir
 
 # All Build rule for target.
-CMakeFiles/PeakFinder.dir/all:
+CMakeFiles/PeakFinder.dir/all: src/visualization/CMakeFiles/VisualizationLib.dir/all
+CMakeFiles/PeakFinder.dir/all: src/computation/CMakeFiles/ComputationLib.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PeakFinder.dir/build.make CMakeFiles/PeakFinder.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PeakFinder.dir/build.make CMakeFiles/PeakFinder.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles --progress-num=1,2 "Built target PeakFinder"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles --progress-num=5,6 "Built target PeakFinder"
 .PHONY : CMakeFiles/PeakFinder.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/PeakFinder.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles 8
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/PeakFinder.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles 0
 .PHONY : CMakeFiles/PeakFinder.dir/rule
@@ -99,6 +135,58 @@ PeakFinder: CMakeFiles/PeakFinder.dir/rule
 CMakeFiles/PeakFinder.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PeakFinder.dir/build.make CMakeFiles/PeakFinder.dir/clean
 .PHONY : CMakeFiles/PeakFinder.dir/clean
+
+#=============================================================================
+# Target rules for target src/visualization/CMakeFiles/VisualizationLib.dir
+
+# All Build rule for target.
+src/visualization/CMakeFiles/VisualizationLib.dir/all:
+	$(MAKE) $(MAKESILENT) -f src/visualization/CMakeFiles/VisualizationLib.dir/build.make src/visualization/CMakeFiles/VisualizationLib.dir/depend
+	$(MAKE) $(MAKESILENT) -f src/visualization/CMakeFiles/VisualizationLib.dir/build.make src/visualization/CMakeFiles/VisualizationLib.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles --progress-num=7,8 "Built target VisualizationLib"
+.PHONY : src/visualization/CMakeFiles/VisualizationLib.dir/all
+
+# Build rule for subdir invocation for target.
+src/visualization/CMakeFiles/VisualizationLib.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/visualization/CMakeFiles/VisualizationLib.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles 0
+.PHONY : src/visualization/CMakeFiles/VisualizationLib.dir/rule
+
+# Convenience name for target.
+VisualizationLib: src/visualization/CMakeFiles/VisualizationLib.dir/rule
+.PHONY : VisualizationLib
+
+# clean rule for target.
+src/visualization/CMakeFiles/VisualizationLib.dir/clean:
+	$(MAKE) $(MAKESILENT) -f src/visualization/CMakeFiles/VisualizationLib.dir/build.make src/visualization/CMakeFiles/VisualizationLib.dir/clean
+.PHONY : src/visualization/CMakeFiles/VisualizationLib.dir/clean
+
+#=============================================================================
+# Target rules for target src/computation/CMakeFiles/ComputationLib.dir
+
+# All Build rule for target.
+src/computation/CMakeFiles/ComputationLib.dir/all:
+	$(MAKE) $(MAKESILENT) -f src/computation/CMakeFiles/ComputationLib.dir/build.make src/computation/CMakeFiles/ComputationLib.dir/depend
+	$(MAKE) $(MAKESILENT) -f src/computation/CMakeFiles/ComputationLib.dir/build.make src/computation/CMakeFiles/ComputationLib.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles --progress-num=1,2,3,4 "Built target ComputationLib"
+.PHONY : src/computation/CMakeFiles/ComputationLib.dir/all
+
+# Build rule for subdir invocation for target.
+src/computation/CMakeFiles/ComputationLib.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/computation/CMakeFiles/ComputationLib.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/build/CMakeFiles 0
+.PHONY : src/computation/CMakeFiles/ComputationLib.dir/rule
+
+# Convenience name for target.
+ComputationLib: src/computation/CMakeFiles/ComputationLib.dir/rule
+.PHONY : ComputationLib
+
+# clean rule for target.
+src/computation/CMakeFiles/ComputationLib.dir/clean:
+	$(MAKE) $(MAKESILENT) -f src/computation/CMakeFiles/ComputationLib.dir/build.make src/computation/CMakeFiles/ComputationLib.dir/clean
+.PHONY : src/computation/CMakeFiles/ComputationLib.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

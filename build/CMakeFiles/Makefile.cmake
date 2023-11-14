@@ -12,6 +12,8 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.27.6/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.27.6/CMakeSystem.cmake"
   "CMakeFiles/hdf5/cmake_hdf5_test.c"
+  "/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/src/computation/CMakeLists.txt"
+  "/Users/arni/Documents/Columbia/Fall2023/Design/prominence-finder/src/visualization/CMakeLists.txt"
   "/opt/homebrew/Cellar/cmake/3.27.6/share/cmake/Modules/CMakeCInformation.cmake"
   "/opt/homebrew/Cellar/cmake/3.27.6/share/cmake/Modules/CMakeCXXInformation.cmake"
   "/opt/homebrew/Cellar/cmake/3.27.6/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake"
@@ -867,9 +869,13 @@ set(CMAKE_MAKEFILE_OUTPUTS
 set(CMAKE_MAKEFILE_PRODUCTS
   ".qt/QtDeploySupport.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
+  "src/visualization/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "src/computation/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/PeakFinder.dir/DependInfo.cmake"
+  "src/visualization/CMakeFiles/VisualizationLib.dir/DependInfo.cmake"
+  "src/computation/CMakeFiles/ComputationLib.dir/DependInfo.cmake"
   )

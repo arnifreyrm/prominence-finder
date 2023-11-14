@@ -129,6 +129,32 @@ PeakFinder/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PeakFinder.dir/build.make CMakeFiles/PeakFinder.dir/build
 .PHONY : PeakFinder/fast
 
+#=============================================================================
+# Target rules for targets named VisualizationLib
+
+# Build rule for target.
+VisualizationLib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 VisualizationLib
+.PHONY : VisualizationLib
+
+# fast build rule for target.
+VisualizationLib/fast:
+	$(MAKE) $(MAKESILENT) -f src/visualization/CMakeFiles/VisualizationLib.dir/build.make src/visualization/CMakeFiles/VisualizationLib.dir/build
+.PHONY : VisualizationLib/fast
+
+#=============================================================================
+# Target rules for targets named ComputationLib
+
+# Build rule for target.
+ComputationLib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ComputationLib
+.PHONY : ComputationLib
+
+# fast build rule for target.
+ComputationLib/fast:
+	$(MAKE) $(MAKESILENT) -f src/computation/CMakeFiles/ComputationLib.dir/build.make src/computation/CMakeFiles/ComputationLib.dir/build
+.PHONY : ComputationLib/fast
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -161,7 +187,9 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... ComputationLib"
 	@echo "... PeakFinder"
+	@echo "... VisualizationLib"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
