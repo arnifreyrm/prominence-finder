@@ -91,8 +91,8 @@ int main(int argc, char *argv[])
   int height = metaData.height;
   int width = metaData.width;
   double waterLevel = metaData.maxElevation;
-  vector<Island> islands(islandPeaks.size());
-  map<int, Island> idToIslandMap;
+  vector<Island> islands;
+  map<unsigned int, Island> idToIslandMap;
 
   while (waterLevel > -1)
   {
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
       Island islandPeak = islandPeaks.top();
       cout << "Island at: " << islandPeak.peakCoords.x << ',' << islandPeak.peakCoords.y << '\n';
       islands.emplace_back(islandPeak);
-      idToIslandMap[islandPeak.id] = islandPeak;
+      idToIslandMap.insert(make_pair(islandPeak.id, islandPeak));
       pointMatrix[islandPeak.peakCoords.y][islandPeak.peakCoords.x].islandId = islandPeak.id;
       islandPeaks.pop();
     }
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
               if (neighborPoint.hasPeak()) // If it is a part of another island, we have reached a key col and we can calculate prominence
               {
                 cout << "Col found at: " << i << ", " << j << ", " << neighborPoint.elevation << '\n';
-                auto otherIsland = idToIslandMap[neighborPoint.islandId];
+                auto otherIsland = idToIslandMap.at(neighborPoint.islandId);
                 if (island.elevation < otherIsland.elevation)
                 {
                   // otherIsland->frontier.insert(otherIsland->frontier.end(), island.frontier.begin(), island.frontier.end());
