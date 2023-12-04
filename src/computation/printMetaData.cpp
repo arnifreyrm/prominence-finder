@@ -3,7 +3,6 @@
 #include "gdal_computation.hpp"
 void printMetaData(GDALDataset *dataset)
 {
-  // Print dataset information using the C++ methods
   GDALDriver *driver = dataset->GetDriver();
   if (driver != nullptr)
   {
