@@ -1,8 +1,9 @@
 data/*
 # Build output
 build/
+build/*
 cmake-build-*/
-
+build/**
 # CMake files
 CMakeCache.txt
 CMakeFiles/
