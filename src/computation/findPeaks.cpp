@@ -101,7 +101,7 @@ priority_queue<Island, vector<Island>, CompareIsland> FindPeaks(GDALDataset *dat
     combinedIslands.insert(combinedIslands.end(), threadIslands.begin(), threadIslands.end());
   }
   priority_queue<Island, vector<Island>, CompareIsland> IslandPQ;
-  unsigned int id = 0;
+  unsigned int id = 1;
   for (auto &island : combinedIslands)
   {
     island.id = id++;
