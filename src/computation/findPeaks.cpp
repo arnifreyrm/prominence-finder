@@ -2,13 +2,15 @@
 #include <thread>
 #include <iostream>
 #include <gdal_priv.h>
+#include <utility>
 #include <queue>
 #include <ogr_spatialref.h>
 #include "gdal_computation.hpp"
 
 using namespace std;
 
-void processRange(const vector<float> &buffer, vector<Island> &localPeaks, int startRow, int endRow, int width, int height, int isolationRadius, double noDataValue, bool checkNoData)
+void processRange(const vector<float> &buffer, vector<shared_ptr<Island>> &localPeaks, int startRow, int endRow, int width, int height, int isolationRadius, double noDataValue, bool checkNoData)
+
 {
   for (int y = startRow; y < endRow; ++y) // Adjusted to include edge pixels
   {
@@ -49,13 +51,13 @@ void processRange(const vector<float> &buffer, vector<Island> &localPeaks, int s
 
       if (isPeak)
       {
-        localPeaks.push_back(Island(Coords(x, y), current));
+        localPeaks.push_back(make_shared<Island>(Coords(x, y), current));
       }
     }
   }
 }
 
-priority_queue<Island, vector<Island>, CompareIsland> FindPeaks(GDALDataset *dataset, int isolationPixelRadius = 10)
+vector<shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRadius = 10)
 {
   // Get the first band (elevation values)
   GDALRasterBand *band = dataset->GetRasterBand(1);
@@ -75,7 +77,7 @@ priority_queue<Island, vector<Island>, CompareIsland> FindPeaks(GDALDataset *dat
   bool checkNoData = hasNoData != 0;
   int numThreads = std::thread::hardware_concurrency();
   vector<std::thread> threads(numThreads);
-  vector<vector<Island>> islandsPerThread(numThreads);
+  vector<vector<shared_ptr<Island>>> islandsPerThread(numThreads);
 
   int chunkSize = height / numThreads;
   for (int i = 0; i < numThreads; ++i)
@@ -95,17 +97,22 @@ priority_queue<Island, vector<Island>, CompareIsland> FindPeaks(GDALDataset *dat
     t.join();
   }
 
-  vector<Island> combinedIslands;
-  for (const auto &threadIslands : islandsPerThread)
-  {
-    combinedIslands.insert(combinedIslands.end(), threadIslands.begin(), threadIslands.end());
-  }
-  priority_queue<Island, vector<Island>, CompareIsland> IslandPQ;
+  vector<shared_ptr<Island>> combinedIslands;
   unsigned int id = 1;
-  for (auto &island : combinedIslands)
+  for (auto &threadIslands : islandsPerThread)
   {
-    island.id = id++;
-    IslandPQ.push(island);
+    for (auto &island : threadIslands)
+    {
+      island->id = id++;
+      combinedIslands.push_back(std::move(island));
+    }
   }
-  return IslandPQ;
+  // Sort combinedIslands based on the elevation
+  sort(combinedIslands.begin(), combinedIslands.end(),
+       [](const shared_ptr<Island> &a, const shared_ptr<Island> &b)
+       {
+         return a->elevation > b->elevation;
+       });
+
+  return combinedIslands;
 }

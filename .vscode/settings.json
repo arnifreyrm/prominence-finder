@@ -79,7 +79,8 @@
     "list": "cpp",
     "set": "cpp",
     "unordered_set": "cpp",
-    "thread": "cpp"
+    "thread": "cpp",
+    "stack": "cpp"
   },
   "C_Cpp.default.cppStandard": "c++20",
   "C_Cpp.default.compilerPath": "/usr/bin/g++",

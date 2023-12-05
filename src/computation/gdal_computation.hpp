@@ -1,6 +1,7 @@
 #include <gdal_priv.h>
 #include <vector>
 #include <queue>
+#include <memory>
 #include <optional>
 #include <set>
 
@@ -27,11 +28,14 @@ class Island
 {
 public:
   unsigned int id;
-  Coords peakCoords;         // Highest point on the island
-  std::set<Coords> frontier; // Points on the edge of the island
+  Coords peakCoords;                       // Highest point on the island
+  std::set<Coords> frontier;               // Points on the edge of the island
+  std::set<unsigned int> dominatedIslands; // Ids of other, lower, islands that this Island has come in contact with.
+  bool flaggedForDeletion;                 // If dominated by another island, set to true and delete it from the vector when we next see it.
   double elevation;
+  double prominence;
 
-  Island(const Coords &peakCoords, double elevation) : peakCoords(peakCoords), elevation(elevation)
+  Island(const Coords &peakCoords, double elevation) : peakCoords(peakCoords), elevation(elevation), flaggedForDeletion(false)
   {
     frontier.emplace(peakCoords);
   }
@@ -48,7 +52,7 @@ struct Point
 
   bool hasPeak() const
   {
-    return bool(islandId);
+    return islandId != 0;
   }
 
   bool belongsToSamePeak(const Point &other) const
@@ -59,23 +63,24 @@ struct Point
 
 struct CompareIsland
 {
-  bool operator()(const Island &a, const Island &b) const
+  bool operator()(const std::unique_ptr<Island> &a, const std::unique_ptr<Island> &b) const
   {
-    return a.elevation < b.elevation;
+    return a->elevation < b->elevation; // Or your comparison logic
   }
 };
 
 struct datasetMetadata
 {
   double maxElevation;
+  double minElevation;
   int height;
   int width;
-  datasetMetadata(double maxElevation, int height, int width)
-      : maxElevation(maxElevation), height(height), width(width) {}
+  datasetMetadata(double maxElevation, double minElevation, int height, int width)
+      : maxElevation(maxElevation), minElevation(minElevation), height(height), width(width) {}
 };
 
 void printMetaData(GDALDataset *dataset);
-std::priority_queue<Island, std::vector<Island>, CompareIsland> FindPeaks(GDALDataset *dataset, int isolationPixelRadius);
+std::vector<std::shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRadius);
 std::pair<double, double> PixelToLatLon(GDALDataset *dataset, int pixelX, int pixelY);
 
 #endif // COMPUTATION_H
