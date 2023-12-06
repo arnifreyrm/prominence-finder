@@ -70,7 +70,11 @@ vector<shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRad
   vector<float> buffer(width * height);
 
   // Read the entire data
-  band->RasterIO(GF_Read, 0, 0, width, height, buffer.data(), width, height, GDT_Float32, 0, 0);
+  auto err = band->RasterIO(GF_Read, 0, 0, width, height, buffer.data(), width, height, GDT_Float32, 0, 0);
+  if (err)
+  {
+    cerr << "Error reading band: " << err << '\n';
+  }
 
   int hasNoData;
   double noDataValue = band->GetNoDataValue(&hasNoData);
@@ -111,8 +115,22 @@ vector<shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRad
   sort(combinedIslands.begin(), combinedIslands.end(),
        [](const shared_ptr<Island> &a, const shared_ptr<Island> &b)
        {
-         return a->elevation > b->elevation;
+         return a->elevation < b->elevation;
        });
+  // By definition, the highest peak in the dataset had a prominence of its elevation
+  combinedIslands.back()->prominence = combinedIslands.back()->elevation;
+
+  vector<int> counts(211);
+
+  for (auto isl : combinedIslands)
+  {
+    counts[int(isl->elevation) / 10]++;
+  }
+  int i = 0;
+  for (auto count : counts)
+  {
+    cout << i++ << "," << count << '\n';
+  }
 
   return combinedIslands;
 }

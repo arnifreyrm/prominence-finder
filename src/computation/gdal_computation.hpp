@@ -37,7 +37,7 @@ public:
 
   Island(const Coords &peakCoords, double elevation) : peakCoords(peakCoords), elevation(elevation), flaggedForDeletion(false)
   {
-    frontier.emplace(peakCoords);
+    frontier.insert(peakCoords);
   }
 };
 

@@ -1,4 +1,4 @@
-data/*
+data/
 # Build output
 build/
 build/*
@@ -32,3 +32,6 @@ Makefile
 # Operating system files
 .DS_Store
 Thumbs.db
+
+.qt/
+.vscode/

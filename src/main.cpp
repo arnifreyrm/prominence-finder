@@ -24,7 +24,51 @@ void printMatrix(vector<vector<Point>> &pointMatrix)
     cout << '\n';
   }
 }
+void printFrontier(vector<vector<Point>> &pointMatrix, set<Coords> frontier)
+{
+  vector<vector<int>> vvi;
+  for (auto i = 0; i < pointMatrix[0].size(); ++i)
+  {
+    vector<int> vi;
+    for (auto j = 0; j < pointMatrix.size(); ++j)
+    {
+      vi.emplace_back(0);
+    }
+    vvi.emplace_back(vi);
+  }
+  for (auto coords : frontier)
+  {
+    vvi[coords.y][coords.x] = 1;
+  }
+  for (auto row : vvi)
+  {
+    for (auto col : row)
+    {
+      if (col)
+        cout << '[' << col << "] ";
+      else
+        cout << "[ ] ";
+    }
+    cout << '\n';
+  }
+}
+vector<Coords> neighbors(Coords coords, int datasetHeight, int datasetWidth)
+{
 
+  vector<Coords> neighborVector;
+  for (int i = coords.x - 1; i <= coords.x + 1; i++)
+  {
+    if (i < 0 || i >= datasetWidth)
+      continue;
+    for (int j = coords.y - 1; j <= coords.y + 1; j++)
+    {
+      if (j < 0 || j >= datasetHeight || (j == coords.y && i == coords.x))
+        continue;
+      neighborVector.emplace_back(Coords(i, j));
+    }
+  }
+  return neighborVector;
+}
 auto gdalDeleter = [](GDALDataset *dataset)
 {
   GDALClose(dataset);
@@ -88,7 +132,7 @@ int main(int argc, char *argv[])
   }
   // Set the water level to the highest point
 
-  auto islandPeaks = FindPeaks(dataset.get(), 15);
+  auto islandPeaks = FindPeaks(dataset.get(), 10);
   auto matrixData = initializeMatrix(dataset.get());
   auto metaData = matrixData.first;
   vector<vector<Point>> pointMatrix = matrixData.second;
@@ -98,7 +142,6 @@ int main(int argc, char *argv[])
   double minElevation = metaData.minElevation;
   vector<shared_ptr<Island>> islands;                  // Stores shared_ptr to Island objects
   map<unsigned int, shared_ptr<Island>> idToIslandMap; // Maps IDs to unique_ptr of Island
-  map<unsigned int, unsigned int> islandAncestry;
 
   cout << "Starting water level prominence calculations for  " << islandPeaks.size() << '\n';
 
@@ -107,11 +150,9 @@ int main(int argc, char *argv[])
     double nextWaterLevel = minElevation;
 
     cout << "Water level: " << waterLevel << '\n';
-    // printMatrix(pointMatrix);
     while (!islandPeaks.empty() && islandPeaks.back()->elevation >= waterLevel)
     {
       shared_ptr<Island> &islandPeak = islandPeaks.back();
-      // cout << "Island at: " << islandPeak->peakCoords.x << ',' << islandPeak->peakCoords.y << '\n';
       unsigned int islandId = islandPeak->id;
       pointMatrix[islandPeak->peakCoords.y][islandPeak->peakCoords.x].islandId = islandId;
 
@@ -121,99 +162,107 @@ int main(int argc, char *argv[])
     }
     // Set the highest submerged elevation as the next island to emerge
     if (!islandPeaks.empty())
+    {
       nextWaterLevel = islandPeaks.back()->elevation;
+    }
 
     for (auto it = islands.begin(); it != islands.end(); it++)
     {
       if ((*it)->flaggedForDeletion)
-      {
         continue;
-      }
-      else
-      {
-        auto &island = **it;
-        // cout << "checking island " << island.id << '\n';
-        set<Coords> newFrontier;
-        bool foundCol = false;
 
+      auto &island = **it;
+      bool frontierExpanded;
+
+      // printMatrix(pointMatrix);
+
+      do
+      {
+        frontierExpanded = false;
+        bool foundCol = false;
+        bool nextToWater = false;
+        set<Coords> newFrontier;
         for (Coords coords : island.frontier)
         {
+
           if (foundCol)
             break;
           Point &frontierPoint = pointMatrix[coords.y][coords.x];
           bool hasUpdated = false;
           // Check the neighboring points
 
-          for (int i = coords.x - 1; i <= coords.x + 1 && !foundCol; i++)
+          for (auto neighborCoords : neighbors(coords, height, width))
           {
-            if (i < 0 || i >= width)
-              continue;
-            for (int j = coords.y - 1; j <= coords.y + 1 && !foundCol; j++)
+            int j = neighborCoords.y;
+            int i = neighborCoords.x;
+            Point neighborPoint = pointMatrix[j][i];
+            // Update the highest submerged point if needed
+            if (neighborPoint.elevation < waterLevel)
             {
-              if (j < 0 || j >= height || (j == coords.y && i == coords.x))
-                continue;
-              Point neighborPoint = pointMatrix[j][i];
-              // Update the highest submerged point if needed
-              if (neighborPoint.elevation < waterLevel && neighborPoint.elevation >= nextWaterLevel)
+              // cout << "Point " << coords.x << ',' << coords.y << ",id:" << neighborPoint.islandId << " at elevation " << frontierPoint.elevation << " next to water at point " << i << ',' << j << " at elevation " << neighborPoint.elevation << " with water level " << waterLevel << '\n';
+              nextToWater = true;
+              if (neighborPoint.elevation > nextWaterLevel)
                 nextWaterLevel = neighborPoint.elevation;
-              // If the neighboring point has no parent peak and is above the water line we will add it to the new frontier
-              if (!neighborPoint.belongsToSamePeak(frontierPoint) && neighborPoint.elevation >= waterLevel)
-              {
-                if (!neighborPoint.hasPeak())
-                {
-                  pointMatrix[j][i].islandId = island.id;
-                  newFrontier.emplace(Coords(i, j));
-                  hasUpdated = true;
-                }
-                else if (!island.dominatedIslands.contains(neighborPoint.islandId)) // If it is a part of another island we haven't seen before, we have reached a key col and we can calculate prominence
-                {
-                  // cout << "Col found at neighbor point eleveation: " << neighborPoint.elevation << ", with current point elevation" << frontierPoint.elevation << " with current island id" << frontierPoint.islandId << " and other island id: " << neighborPoint.islandId << '\n';
-                  // cout << "Current island domination set:";
-                  // for (auto id : island.dominatedIslands)
-                  //   cout << id;
-                  // cout << '\n';
-                  auto &otherIsland = *idToIslandMap[neighborPoint.islandId];
-                  if (island.elevation <= otherIsland.elevation)
-                  {
-                    for (auto lowerIslandCoords : island.frontier)
-                    {
-                      pointMatrix[lowerIslandCoords.y][lowerIslandCoords.x].islandId = otherIsland.id;
-                    }
-                    otherIsland.frontier.insert(island.frontier.begin(), island.frontier.end());
-                    otherIsland.dominatedIslands.insert(island.id);
-                    islandAncestry[island.id] = otherIsland.id;
-                    // We erase the current island from the vector now, as we have the iterator
-                    island.flaggedForDeletion = true;
-                    island.prominence = island.elevation - min(neighborPoint.elevation, frontierPoint.elevation);
-                    foundCol = true;
-                    break;
-                  }
-                  else
-                  {
-                    for (auto lowerIslandCoords : otherIsland.frontier)
-                    {
-                      pointMatrix[lowerIslandCoords.y][lowerIslandCoords.x].islandId = island.id;
-                    }
-                    island.dominatedIslands.insert(island.id);
-                    islandAncestry[otherIsland.id] = island.id;
-                    newFrontier.insert(otherIsland.frontier.begin(), otherIsland.frontier.end());
-                    otherIsland.prominence = otherIsland.elevation - min(neighborPoint.elevation, frontierPoint.elevation);
-                    // We flag the island for deletion, and delete it the next time we see it instead of using find_if to locate the iterator
-                    otherIsland.flaggedForDeletion = true;
-                  }
-                }
-              };
             }
+            // If the neighboring point has no parent peak and is above the water line we will add it to the new frontier
+            if (!neighborPoint.belongsToSamePeak(frontierPoint) && neighborPoint.elevation >= waterLevel)
+            {
+              if (!neighborPoint.hasPeak())
+              {
+                pointMatrix[j][i].islandId = island.id;
+                newFrontier.emplace(Coords(i, j));
+                hasUpdated = true;
+                frontierExpanded = true;
+              }
+              else if (!island.dominatedIslands.contains(neighborPoint.islandId)) // If it is a part of another island we haven't seen before, we have reached a key col and we can calculate prominence
+              {
+                auto &otherIsland = *idToIslandMap[neighborPoint.islandId];
+                if (island.elevation <= otherIsland.elevation)
+                {
+                  for (auto lowerIslandCoords : island.frontier)
+                  {
+                    pointMatrix[lowerIslandCoords.y][lowerIslandCoords.x].islandId = otherIsland.id;
+                  }
+                  otherIsland.frontier.insert(island.frontier.begin(), island.frontier.end());
+                  otherIsland.dominatedIslands.insert(island.id);
+                  otherIsland.dominatedIslands.insert(island.dominatedIslands.begin(), island.dominatedIslands.end());
+                  // We erase the current island from the vector now, as we have the iterator
+                  island.flaggedForDeletion = true;
+                  island.prominence = island.elevation - min(neighborPoint.elevation, frontierPoint.elevation);
+                }
+                else
+                {
+                  for (auto lowerIslandCoords : otherIsland.frontier)
+                  {
+                    pointMatrix[lowerIslandCoords.y][lowerIslandCoords.x].islandId = island.id;
+                  }
+                  island.dominatedIslands.insert(otherIsland.id);
+                  island.dominatedIslands.insert(otherIsland.dominatedIslands.begin(), otherIsland.dominatedIslands.end());
+                  newFrontier.insert(otherIsland.frontier.begin(), otherIsland.frontier.end());
+                  otherIsland.prominence = otherIsland.elevation - min(neighborPoint.elevation, frontierPoint.elevation);
+                  // We flag the island for deletion, and delete it the next time we see it instead of using find_if to locate the iterator
+                  otherIsland.flaggedForDeletion = true;
+                }
+              }
+            };
           }
-          // If the frontier does not update, keep the old value
-          if (!hasUpdated)
+
+          // If the frontier does not update, but is still next to the water, keep the old value
+          if (!hasUpdated && nextToWater)
+          {
             newFrontier.emplace(coords);
+          }
         }
         island.frontier = newFrontier;
-      }
+      } while (frontierExpanded);
     }
+
     // drain the water level down to the next point
     waterLevel = nextWaterLevel;
+  }
+  for (auto &island : islands)
+  {
+    cout << "Peak #" << island->id << " has prominence " << island->prominence << '\n';
   }
   return EXIT_SUCCESS;
 }
