@@ -59,7 +59,7 @@ void processRange(const vector<float> &buffer, vector<shared_ptr<Island>> &local
 
 vector<shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRadius = 10)
 {
-  // Get the first band (elevation values)
+  // Get the elevation
   GDALRasterBand *band = dataset->GetRasterBand(1);
 
   // Get the size of the raster band
@@ -83,6 +83,7 @@ vector<shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRad
   vector<std::thread> threads(numThreads);
   vector<vector<shared_ptr<Island>>> islandsPerThread(numThreads);
 
+  // Split the dataset into chunks and process it in paralel as it is read-only
   int chunkSize = height / numThreads;
   for (int i = 0; i < numThreads; ++i)
   {
@@ -111,7 +112,7 @@ vector<shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRad
       combinedIslands.push_back(std::move(island));
     }
   }
-  // Sort combinedIslands based on the elevation
+  // Sort combinedIslands based on the elevation,
   sort(combinedIslands.begin(), combinedIslands.end(),
        [](const shared_ptr<Island> &a, const shared_ptr<Island> &b)
        {
