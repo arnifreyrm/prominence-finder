@@ -1,19 +1,10 @@
 #include <vector>
 #include <gdal_priv.h>
-
+#include <memory>
+#include <stdexcept>
+#include <utility>
 #include "gdal_computation.hpp"
 using namespace std;
-
-auto OGRSpatialReferenceDeleter = [](OGRSpatialReference *ptr)
-{
-  if (ptr)
-    OGRSpatialReference::DestroySpatialReference(ptr);
-};
-auto OGRCoordinateTransformationDeleter = [](OGRCoordinateTransformation *ptr)
-{
-  if (ptr)
-    OCTDestroyCoordinateTransformation(ptr);
-};
 
 pair<double, double> PixelToLatLon(GDALDataset *dataset, int pixelX, int pixelY)
 {

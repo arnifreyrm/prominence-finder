@@ -1,8 +1,9 @@
-data/*
+data/
 # Build output
 build/
+build/*
 cmake-build-*/
-
+build/**
 # CMake files
 CMakeCache.txt
 CMakeFiles/
@@ -31,3 +32,8 @@ Makefile
 # Operating system files
 .DS_Store
 Thumbs.db
+
+.qt/
+.vscode/
+.qt/*
+.vscode/*

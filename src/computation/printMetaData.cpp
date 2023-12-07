@@ -1,9 +1,10 @@
 #include <gdal_priv.h>
 #include <iostream>
 #include "gdal_computation.hpp"
+
+// Prints metadata for a given GDAL dataset
 void printMetaData(GDALDataset *dataset)
 {
-  // Print dataset information using the C++ methods
   GDALDriver *driver = dataset->GetDriver();
   if (driver != nullptr)
   {
