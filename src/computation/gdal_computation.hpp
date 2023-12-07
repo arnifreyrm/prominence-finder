@@ -66,7 +66,6 @@ struct Transformer
 
   explicit Transformer(GDALDataset *dataset)
   {
-    // Similar setup as in PixelToLatLon function
     const char *wkt = dataset->GetProjectionRef();
     if (!wkt)
     {
@@ -116,7 +115,7 @@ struct Point
   Point(double elevation) : elevation(elevation) {}
   Point(double elevation, unsigned int islandId) : elevation(elevation), islandId(islandId) {}
 
-  bool hasPeak() const
+  bool belongsToAnyIsland() const
   {
     return islandId != 0;
   }
@@ -154,10 +153,18 @@ struct datasetMetadata
 
 void printMetaData(GDALDataset *dataset);
 std::vector<Coords> neighbors(Coords coords, int datasetHeight, int datasetWidth);
-std::vector<std::shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRadius);
+std::vector<std::shared_ptr<Island>> findPeakIslands(GDALDataset *dataset);
+std::pair<datasetMetadata, std::vector<std::vector<Point>>> initializeMatrix(GDALDataset *dataset);
+void processKeyCol(Island &island1, Island &island2, double colElevation, std::vector<std::vector<Point>> &pointMatrix);
+std::shared_ptr<Island> getIslandIfExists(const std::map<unsigned int, std::shared_ptr<Island>> &map, unsigned int key);
 std::pair<double, double> PixelToLatLon(GDALDataset *dataset, int pixelX, int pixelY);
+void appendIslandDataToFile(const std::shared_ptr<Island> &island, const std::string &filename, const std::unique_ptr<Transformer> &transformerPtr);
+void readToCSV(std::vector<std::shared_ptr<Island>> islands, const std::string &filename);
 void printMatrixElevation(std::vector<std::vector<Point>> &pointMatrix);
-void printMatrix(std::vector<std::vector<Point>> &pointMatrix);
+void printMatrixIslandIds(std::vector<std::vector<Point>> &pointMatrix);
 void printFrontier(std::vector<std::vector<Point>> &pointMatrix, std::set<Coords> frontier);
+void calculateProminence(std::unique_ptr<GDALDataset, decltype(gdalDeleter)> &dataset,
+                         const std::string &outputFilePath,
+                         bool prominenceThreshold, bool verbose);
 
 #endif // COMPUTATION_H

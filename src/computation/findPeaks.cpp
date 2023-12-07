@@ -57,7 +57,7 @@ void processRange(const vector<float> &buffer, vector<shared_ptr<Island>> &local
   }
 }
 
-vector<shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRadius = 10)
+vector<shared_ptr<Island>> findPeakIslands(GDALDataset *dataset)
 {
   // Get the elevation
   GDALRasterBand *band = dataset->GetRasterBand(1);
@@ -65,6 +65,7 @@ vector<shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRad
   // Get the size of the raster band
   int width = band->GetXSize();
   int height = band->GetYSize();
+  constexpr int isolationPixelRadius = 1;
 
   // Buffer to hold data
   vector<float> buffer(width * height);
@@ -120,18 +121,6 @@ vector<shared_ptr<Island>> FindPeaks(GDALDataset *dataset, int isolationPixelRad
        });
   // By definition, the highest peak in the dataset had a prominence of its elevation
   combinedIslands.back()->prominence = combinedIslands.back()->elevation;
-
-  vector<int> counts(211);
-
-  for (auto isl : combinedIslands)
-  {
-    counts[int(isl->elevation) / 10]++;
-  }
-  int i = 0;
-  for (auto count : counts)
-  {
-    cout << i++ << "," << count << '\n';
-  }
 
   return combinedIslands;
 }

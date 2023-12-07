@@ -4,8 +4,11 @@
 #include "gdal_computation.hpp"
 
 using namespace std;
-void printMatrix(vector<vector<Point>> &pointMatrix)
+
+// Prints island ids of all points in the pointMatrix. Only use for small datasets!
+void printMatrixIslandIds(vector<vector<Point>> &pointMatrix)
 {
+
   for (auto &row : pointMatrix)
   {
     for (auto &col : row)
@@ -16,6 +19,7 @@ void printMatrix(vector<vector<Point>> &pointMatrix)
     cout << '\n';
   }
 }
+// Prints the elevation of all points in the pointMatrix. Only use for tiny toy datasets!
 void printMatrixElevation(vector<vector<Point>> &pointMatrix)
 {
   for (auto &row : pointMatrix)
@@ -32,6 +36,7 @@ void printMatrixElevation(vector<vector<Point>> &pointMatrix)
     cout << '\n';
   }
 }
+// Prints the frontier point on the map. Only use for tiny toy datasets!
 void printFrontier(vector<vector<Point>> &pointMatrix, set<Coords> frontier)
 {
   vector<vector<int>> vvi;
