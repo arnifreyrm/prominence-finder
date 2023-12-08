@@ -5,6 +5,7 @@
 
 using namespace std;
 
+// Fills a 2d vector with each point of the dataset being of type Point, containing the elevation and islandId
 pair<datasetMetadata, vector<vector<Point>>> initializeMatrix(GDALDataset *dataset)
 {
 

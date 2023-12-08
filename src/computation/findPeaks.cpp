@@ -121,6 +121,5 @@ vector<shared_ptr<Island>> findPeakIslands(GDALDataset *dataset)
        });
   // By definition, the highest peak in the dataset had a prominence of its elevation
   combinedIslands.back()->prominence = combinedIslands.back()->elevation;
-
   return combinedIslands;
 }

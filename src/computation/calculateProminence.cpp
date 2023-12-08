@@ -1,3 +1,4 @@
+#include "gdal_computation.hpp"
 #include <iostream>
 #include <memory>
 #include <gdal.h>
@@ -8,15 +9,11 @@
 #include <string>
 #include <map>
 #include <ogr_spatialref.h>
-#include "gdal_computation.hpp"
+
 using namespace std;
 
-void calculateProminence(unique_ptr<GDALDataset, decltype(gdalDeleter)> &dataset,
-                         const string &outputFilePath,
-                         bool prominenceThreshold, bool verbose)
+void calculateProminence(unique_ptr<GDALDataset> &dataset, const string outputFilePath, int prominenceThreshold = 0, bool verbose = false)
 {
-
-  // Set the water level to the highest point
   vector<shared_ptr<Island>> islandPeaks = findPeakIslands(dataset.get());
   auto matrixData = initializeMatrix(dataset.get());
 
@@ -25,26 +22,32 @@ void calculateProminence(unique_ptr<GDALDataset, decltype(gdalDeleter)> &dataset
   {
     coordinateTransformer = make_unique<Transformer>(dataset.get());
   }
+  if (!outputFilePath.empty())
+  {
+    initializeCSV(outputFilePath);
+  }
 
   auto metaData = matrixData.first;
   vector<vector<Point>> pointMatrix = matrixData.second;
   int height = metaData.height;
   int width = metaData.width;
+  // Set the water level to the highest point
   int waterLevel = int(metaData.maxElevation);
   double minElevation = metaData.minElevation;
   vector<shared_ptr<Island>> activeIslands;
   map<unsigned int, shared_ptr<Island>> idToIslandMap;
 
-  // Explicitly release the dataset as we don't need it any more
+  // Explicitly release the dataset as we don't need it any more -- not the best but works
   dataset.reset();
+
   if (verbose)
     cout << "Starting water level prominence calculations for  " << islandPeaks.size() << '\n';
 
   while (waterLevel >= minElevation)
   {
-    double nextWaterLevel = minElevation;
     if (verbose)
       cout << "Water level: " << waterLevel << " Active island count " << activeIslands.size() << '\n';
+
     while (!islandPeaks.empty() && islandPeaks.back()->elevation >= waterLevel)
     {
       shared_ptr<Island> &islandPeak = islandPeaks.back();
@@ -54,11 +57,6 @@ void calculateProminence(unique_ptr<GDALDataset, decltype(gdalDeleter)> &dataset
       idToIslandMap[islandId] = islandPeak;
       activeIslands.push_back(islandPeak);
       islandPeaks.pop_back();
-    }
-    // Set the highest submerged elevation as the next island to emerge
-    if (!islandPeaks.empty())
-    {
-      nextWaterLevel = islandPeaks.back()->elevation;
     }
 
     for (auto it = activeIslands.begin(); it != activeIslands.end();)
@@ -99,13 +97,13 @@ void calculateProminence(unique_ptr<GDALDataset, decltype(gdalDeleter)> &dataset
               int j = neighborCoords.y;
               int i = neighborCoords.x;
               Point neighborPoint = pointMatrix[j][i];
-              // Update the highest submerged point if needed
+              // Check if current point is next to water to see if we keep it in the frontier
               if (neighborPoint.elevation < waterLevel)
               {
                 nextToWater = true;
               }
-              // If the neighboring point has no parent peak and is above the water line we will add it to the new frontier
-              if (!neighborPoint.belongsToSamePeak(frontierPoint) && neighborPoint.elevation >= waterLevel)
+              // If the neighboring point is not claimed by any island and is above the water line we will add it to the new frontier
+              if (!neighborPoint.belongsToIsland(frontierPoint) && neighborPoint.elevation >= waterLevel)
               {
                 if (!neighborPoint.belongsToAnyIsland())
                 {
@@ -114,7 +112,7 @@ void calculateProminence(unique_ptr<GDALDataset, decltype(gdalDeleter)> &dataset
                   hasUpdated = true;
                   frontierExpanded = true;
                 }
-                else if (!island.dominatedIslands.contains(neighborPoint.islandId) && !keyCol.found) // If it is a part of another island we haven't seen before, we have reached a key col and we can calculate prominence
+                else if (!island.dominatedIslands.contains(neighborPoint.islandId) && !keyCol.found) // If it is a part of another island we haven't seen before and we haven't reached the key col earlier in the iteration, we have reached a key col and we can calculate prominence
                 {
                   auto otherIslandPtr = getIslandIfExists(idToIslandMap, neighborPoint.islandId);
                   if (otherIslandPtr == nullptr)
@@ -147,7 +145,6 @@ void calculateProminence(unique_ptr<GDALDataset, decltype(gdalDeleter)> &dataset
         ++it;
       }
     }
-
     // Drain the water level down to the next point
     waterLevel -= 1;
   }

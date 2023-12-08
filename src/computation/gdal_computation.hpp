@@ -2,7 +2,6 @@
 #include <vector>
 #include <queue>
 #include <memory>
-#include <optional>
 #include <set>
 #include <memory>
 #include <stdexcept>
@@ -50,10 +49,7 @@ auto OGRSpatialReferenceDeleter = [](OGRSpatialReference *ptr)
   if (ptr)
     OGRSpatialReference::DestroySpatialReference(ptr);
 };
-auto gdalDeleter = [](GDALDataset *dataset)
-{
-  GDALClose(dataset);
-};
+
 auto OGRCoordinateTransformationDeleter = [](OGRCoordinateTransformation *ptr)
 {
   if (ptr)
@@ -120,7 +116,7 @@ struct Point
     return islandId != 0;
   }
 
-  bool belongsToSamePeak(const Point &other) const
+  bool belongsToIsland(const Point &other) const
   {
     return islandId == other.islandId;
   }
@@ -150,8 +146,9 @@ struct datasetMetadata
   datasetMetadata(double maxElevation, double minElevation, int height, int width)
       : maxElevation(maxElevation), minElevation(minElevation), height(height), width(width) {}
 };
-
+void calculateProminence(std::unique_ptr<GDALDataset> &dataset, std::string outputFilePath, int prominenceThreshold, bool verbose);
 void printMetaData(GDALDataset *dataset);
+// void calculateProminence(const std::string outputFilePath, int prominenceThreshold, bool verbose);
 std::vector<Coords> neighbors(Coords coords, int datasetHeight, int datasetWidth);
 std::vector<std::shared_ptr<Island>> findPeakIslands(GDALDataset *dataset);
 std::pair<datasetMetadata, std::vector<std::vector<Point>>> initializeMatrix(GDALDataset *dataset);
@@ -159,12 +156,9 @@ void processKeyCol(Island &island1, Island &island2, double colElevation, std::v
 std::shared_ptr<Island> getIslandIfExists(const std::map<unsigned int, std::shared_ptr<Island>> &map, unsigned int key);
 std::pair<double, double> PixelToLatLon(GDALDataset *dataset, int pixelX, int pixelY);
 void appendIslandDataToFile(const std::shared_ptr<Island> &island, const std::string &filename, const std::unique_ptr<Transformer> &transformerPtr);
-void readToCSV(std::vector<std::shared_ptr<Island>> islands, const std::string &filename);
+void initializeCSV(const std::string &filename);
 void printMatrixElevation(std::vector<std::vector<Point>> &pointMatrix);
 void printMatrixIslandIds(std::vector<std::vector<Point>> &pointMatrix);
 void printFrontier(std::vector<std::vector<Point>> &pointMatrix, std::set<Coords> frontier);
-void calculateProminence(std::unique_ptr<GDALDataset, decltype(gdalDeleter)> &dataset,
-                         const std::string &outputFilePath,
-                         bool prominenceThreshold, bool verbose);
 
 #endif // COMPUTATION_H

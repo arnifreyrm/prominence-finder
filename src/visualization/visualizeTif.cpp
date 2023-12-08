@@ -36,7 +36,7 @@ void visualizeTif(std::string path)
   vtkSmartPointer<vtkWarpScalar> warpScalar =
       vtkSmartPointer<vtkWarpScalar>::New();
   warpScalar->SetInputConnection(geometryFilter->GetOutputPort());
-  warpScalar->SetScaleFactor(1); // Invert the scale factor if we need to exaggerate later
+  warpScalar->SetScaleFactor(1);
   warpScalar->Update();
 
   vtkSmartPointer<vtkPolyDataMapper> mapper =

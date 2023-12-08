@@ -36,26 +36,23 @@ void appendIslandDataToFile(const shared_ptr<Island> &island, const string &file
 
   outFile.close();
 }
-void readToCSV(vector<shared_ptr<Island>> islands, const string &filename = "../results/peaks.csv")
+
+void initializeCSV(const string &filename = "../results/peaks.csv")
 {
   ofstream outFile(filename);
 
   if (!outFile.is_open())
   {
-    cerr << "Error: Unable to open file for writing.\n"; // or handle the error as you prefer
+    cerr << "Error: Unable to open file for writing.\n";
   }
 
-  outFile << "x,y,prominence,elevation\n";
+  outFile << "x,"
+          << "y,"
+          << "prominence,"
+          << "latitude,"
+          << "longitude,"
+          << "elevation"
+          << "\n";
 
-  for (const auto &island : islands)
-  {
-    if (island)
-    {
-      outFile << island->peakCoords.x << ","
-              << island->peakCoords.y << ","
-              << island->prominence << ","
-              << island->elevation << "\n";
-    }
-  }
   outFile.close();
 }

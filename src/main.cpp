@@ -10,11 +10,12 @@
 #include <ogr_spatialref.h>
 #include "visualization/visualizeTif.hpp"
 #include "computation/gdal_computation.hpp"
+
 using namespace std;
 
-// Run ./PeakFinder ../data/Iceland_low_res.tif
 int main(int argc, char *argv[])
 {
+  GDALAllRegister();
 
   if (argc <= 1)
   {
@@ -60,8 +61,9 @@ int main(int argc, char *argv[])
     visualizeTif(demFilePath);
     return 0;
   }
-  GDALAllRegister();
-  unique_ptr<GDALDataset, decltype(gdalDeleter)> dataset(static_cast<GDALDataset *>(GDALOpen(demFilePath.c_str(), GA_ReadOnly)), gdalDeleter);
+
+  unique_ptr<GDALDataset> dataset(static_cast<GDALDataset *>(GDALOpen(demFilePath.c_str(), GA_ReadOnly)));
+
   if (dataset == nullptr)
   {
     cerr << "Failed to open file: " << demFilePath << endl;
@@ -70,5 +72,6 @@ int main(int argc, char *argv[])
 
   // Calculate prominence
   calculateProminence(dataset, outputFilePath, prominenceThreshold, verbose);
+
   return EXIT_SUCCESS;
 }
