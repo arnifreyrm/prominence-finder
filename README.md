@@ -12,9 +12,39 @@ From [Peakbagger](https://www.peakbagger.com/Help/Glossary.aspx#prom):
 ## Dependencies
 - [GDAL](https://gdal.org/download.html) to parse .tif data
 - [VTK](https://vtk.org/download/) to render a 3d visualization of the dataset
-- [CMake](https://cmake.org/cmake/help/latest/command/install.html) To build and compile the project 
+- [CMake](https://cmake.org/cmake/help/latest/command/install.html) To build and compile the project
 
+## Building and running
 
+Clone the project: run ```git@github.com:arnifreyrm/prominence-finder.git```
 
+navigate into the project, then run:
 
-The .tif raster data can be found [here](https://ftp.lmi.is/gisdata/raster/)
+```mkdir build```
+
+```cd build```
+
+```cmake ..```
+
+```make```
+
+To run it, you need a DEM (Digital Elevation Map) in a .tif format. There is one included toy dataset included so to try it out you can run:
+
+```./PeakFinder ../data/two_pyramids.tif -visualize```
+
+to visualize the dataset.
+
+To run the prominence calculations run:
+
+```./PeakFinder ../data/two_pyramids.tif -o ../results/two_pyramids.csv```
+
+And you will have the results in ```/results/two_pyramids.csv```
+
+# Syntax
+
+```./Peakfinder <input file>```
+
+##Flags
+-  `-o` Output file. Needs to be followed by a path to a csv file.
+-  `-visualize` Runs visualization instead of calculation
+-  `-threshold` Sets a prominence threshold for outputted peaks. Needs to be followed by an integer value.
