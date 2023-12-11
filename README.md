@@ -44,7 +44,7 @@ And you will have the results in ```/results/two_pyramids.csv```
 
 ```./Peakfinder <input file>```
 
-##Flags
+## Flags
 -  `-o` Output file. Needs to be followed by a path to a csv file.
 -  `-visualize` Runs visualization instead of calculation
 -  `-threshold` Sets a prominence threshold for outputted peaks. Needs to be followed by an integer value.
