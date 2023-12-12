@@ -115,6 +115,13 @@ struct Transformer
       throw std::runtime_error("Failed to get GeoTransform.");
     }
   }
+  /**
+   * @brief Transforms dataset indexes to latitude and longitude coordinates
+   *
+   * @param pixelX
+   * @param pixelY
+   * @return std::pair<double, double>
+   */
   std::pair<double, double> transform(int pixelX, int pixelY)
   {
     double x = adfGeoTransform[0] + pixelX * adfGeoTransform[1] + pixelY * adfGeoTransform[2];
