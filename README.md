@@ -28,7 +28,7 @@ navigate into the project, then run:
 
 ```make```
 
-To run it, you need a DEM (Digital Elevation Map) in a .tif format. There is one included toy dataset included so to try it out you can run:
+To run it, you need a DEM (Digital Elevation Map) in a .tif format. There is one included toy dataset included so to try it out you can run: 
 
 ```./PeakFinder ../data/two_pyramids.tif -visualize```
 
