@@ -27,6 +27,7 @@ using namespace std;
 
  *
  * For more details on how to use this application, refer to the respective functions and classes.
+ * For a quick start, refer the the project repo at https://github.com/arnifreyrm/prominence-finder
  */
 
 int main(int argc, char *argv[])
