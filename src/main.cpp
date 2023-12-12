@@ -13,6 +13,22 @@
 
 using namespace std;
 
+/**
+ * @mainpage Prominence Finder Documentation
+ *
+ * Welcome to the Prominence Finder project documentation.
+ *
+ * This application is designed to process digital elevation models (DEMs) to calculate the prominence of peaks. It uses GDAL for processing geospatial data and VTK to visualize the datasets.
+ *
+ * The main functionalities include:
+ * - Visualizing .tif files with VTK
+ * - Reading and processing .tif files representing DEMs.
+ * - Calculating the prominence of features in the DEM.
+ * - Optionally visualizing the results.
+ *
+ * For more details on how to use this application, refer to the respective functions and classes.
+ */
+
 int main(int argc, char *argv[])
 {
   GDALAllRegister();
