@@ -1,6 +1,7 @@
 # prominence-finder
 A C++ program to locate all peaks and calculate their prominence
-
+# Docs
+Full docs can be accessed [here](https://arnifreyrm.github.io/prominence-finder/)
 
 # What is prominence?
 
