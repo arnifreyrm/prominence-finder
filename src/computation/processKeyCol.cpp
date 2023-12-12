@@ -3,6 +3,16 @@
 
 using namespace std;
 
+/**
+ * @brief Processes the key col between two islands.
+ *
+ * Handles the interaction and prominence calculation between two islands at a key col.
+ *
+ * @param island1 Reference to the first Island object.
+ * @param island2 Reference to the second Island object.
+ * @param colElevation Elevation of the key col.
+ * @param pointMatrix Reference to the matrix of Points representing the dataset.
+ */
 void processKeyCol(Island &island1, Island &island2, double colElevation, vector<vector<Point>> &pointMatrix)
 {
   Island *lowerIsland, *higherIsland;

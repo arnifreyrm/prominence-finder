@@ -6,6 +6,13 @@
 
 using namespace std;
 
+/**
+ * @brief Writes out the peak data to the outputFile
+ *
+ * @param island Island to write from
+ * @param filename output file to write to
+ * @param transformerPtr pointer to the Transformer to calculate latitude and longitude
+ */
 // Appends the peak results to a csv file
 void appendIslandDataToFile(const shared_ptr<Island> &island, const string &filename = "../results/peaks.csv", const unique_ptr<Transformer> &transformerPtr = nullptr)
 {

@@ -5,7 +5,14 @@
 
 using namespace std;
 
-// Fills a 2d vector with each point of the dataset being of type Point, containing the elevation and islandId
+/**
+ * @brief Initializes a matrix to represent points in the dataset.
+ *
+ * Creates a matrix structure to hold point data including elevation and island associations.
+ *
+ * @param dataset Pointer to the dataset being analyzed.
+ * @return Pair containing dataset metadata and the initialized matrix of Points.
+ */
 pair<datasetMetadata, vector<vector<Point>>> initializeMatrix(GDALDataset *dataset)
 {
 

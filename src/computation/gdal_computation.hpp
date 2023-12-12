@@ -10,6 +10,12 @@
 #ifndef COMPUTATION_H
 #define COMPUTATION_H
 
+/**
+ * @brief Represents simple x, y coordinates.
+ *
+ * Defines a 2D point with x and y integer coordinates. Includes
+ * basic operations like equality and comparison for use in sets and maps.
+ */
 struct Coords
 {
   int x;
@@ -27,6 +33,12 @@ struct Coords
     return x < other.x;
   }
 };
+/**
+ * @brief Manages island characteristics for peak prominence calculations.
+ *
+ * Handles the properties and interactions of an island, including its peak, edges,
+ * and elevation, crucial for determining its prominence in relation to other islands.
+ */
 class Island
 {
 public:
@@ -43,18 +55,33 @@ public:
     frontier.insert(peakCoords);
   }
 };
-
+/**
+ * @brief Custom deleter for OGRSpatialReference objects.
+ *
+ *
+ */
 auto OGRSpatialReferenceDeleter = [](OGRSpatialReference *ptr)
 {
   if (ptr)
     OGRSpatialReference::DestroySpatialReference(ptr);
 };
-
+/**
+ * @brief Custom deleter for OGRCoordinateTransformation objects.
+ *
+ * Manages the destruction of OGRCoordinateTransformation objects,
+ * preventing memory leaks by correctly freeing allocated resources.
+ */
 auto OGRCoordinateTransformationDeleter = [](OGRCoordinateTransformation *ptr)
 {
   if (ptr)
     OCTDestroyCoordinateTransformation(ptr);
 };
+/**
+ * @brief Handles coordinate transformations for geographic data.
+ *
+ * Responsible for converting coordinates between different spatial
+ * reference systems using GDAL functionalities.
+ */
 struct Transformer
 {
   std::unique_ptr<OGRCoordinateTransformation, decltype(OGRCoordinateTransformationDeleter)> transformation;
@@ -101,7 +128,12 @@ struct Transformer
     return std::make_pair(x, y);
   }
 };
-
+/**
+ * @brief Represents a point with elevation and island association data.
+ *
+ * Stores the elevation of a point and its association with an island,
+ * if any. It includes methods to determine island affiliation.
+ */
 struct Point
 {
   unsigned int islandId;
@@ -121,7 +153,12 @@ struct Point
     return islandId == other.islandId;
   }
 };
-
+/**
+ * @brief Comparator for island elevation.
+ *
+ * Defines a comparison rule for islands based on their elevation, used in findPeakIslands to sort the vector based on height
+ *
+ */
 struct CompareIsland
 {
   bool operator()(const std::unique_ptr<Island> &a, const std::unique_ptr<Island> &b) const
@@ -129,6 +166,13 @@ struct CompareIsland
     return a->elevation < b->elevation;
   }
 };
+/**
+ * @brief Stores key col information for island interactions.
+ *
+ * Contains data about the key col (lowest point) in the interaction
+ * between two islands, including the other island's reference and
+ * the col elevation and coordinates. Used in the main water level loop
+ */
 struct KeyColInfo
 {
   std::shared_ptr<Island> otherIsland;
@@ -137,6 +181,12 @@ struct KeyColInfo
   bool found;
   KeyColInfo(){};
 };
+/**
+ * @brief Holds metadata for the dataset.
+ *
+ * Encapsulates important information about the dataset, such as
+ * maximum and minimum elevations, and the dataset's dimensions.
+ */
 struct datasetMetadata
 {
   double maxElevation;
@@ -146,9 +196,11 @@ struct datasetMetadata
   datasetMetadata(double maxElevation, double minElevation, int height, int width)
       : maxElevation(maxElevation), minElevation(minElevation), height(height), width(width) {}
 };
+
+// Functions defined in their own files
+
 void calculateProminence(std::unique_ptr<GDALDataset> &dataset, std::string outputFilePath, int prominenceThreshold, bool verbose);
 void printMetaData(GDALDataset *dataset);
-// void calculateProminence(const std::string outputFilePath, int prominenceThreshold, bool verbose);
 std::vector<Coords> neighbors(Coords coords, int datasetHeight, int datasetWidth);
 std::vector<std::shared_ptr<Island>> findPeakIslands(GDALDataset *dataset);
 std::pair<datasetMetadata, std::vector<std::vector<Point>>> initializeMatrix(GDALDataset *dataset);
@@ -157,8 +209,5 @@ std::shared_ptr<Island> getIslandIfExists(const std::map<unsigned int, std::shar
 std::pair<double, double> PixelToLatLon(GDALDataset *dataset, int pixelX, int pixelY);
 void appendIslandDataToFile(const std::shared_ptr<Island> &island, const std::string &filename, const std::unique_ptr<Transformer> &transformerPtr);
 void initializeCSV(const std::string &filename);
-void printMatrixElevation(std::vector<std::vector<Point>> &pointMatrix);
-void printMatrixIslandIds(std::vector<std::vector<Point>> &pointMatrix);
-void printFrontier(std::vector<std::vector<Point>> &pointMatrix, std::set<Coords> frontier);
 
 #endif // COMPUTATION_H

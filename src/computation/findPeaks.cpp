@@ -9,6 +9,19 @@
 
 using namespace std;
 
+/**
+ * @brief Processes a range/chunk from the dataset buffer and adds all local maxima to a vector of shared pointers of islands given in the input
+ *
+ * @param buffer The elevation raster band from the DEM in a buffer
+ * @param localPeaks The vector of shared pointers to append islands to
+ * @param startRow The starting point of the range
+ * @param endRow The end point of the range
+ * @param width Width of the dataset
+ * @param height The height of the dataset
+ * @param isolationRadius In what pixel radius the peak has to be the highest. Usually 1 but left as a parameter for future iterations.
+ * @param noDataValue The "No Data Value" of the dataset, where there is no elevation data, for example the ocean. Usually set to some representation of negative infinity.
+ * @param checkNoData Flag to check if dataset contains "No Data Values"
+ */
 void processRange(const vector<float> &buffer, vector<shared_ptr<Island>> &localPeaks, int startRow, int endRow, int width, int height, int isolationRadius, double noDataValue, bool checkNoData)
 
 {
@@ -57,10 +70,18 @@ void processRange(const vector<float> &buffer, vector<shared_ptr<Island>> &local
   }
 }
 
-vector<shared_ptr<Island>> findPeakIslands(GDALDataset *dataset)
+/**
+ * @brief Finds peak islands within a dataset.
+ *
+ * Identifies and returns a collection of islands that represent peaks in the given dataset.
+ *
+ * @param dataset Pointer to the dataset being analyzed.
+ * @return Vector of shared pointers to identified Island objects.
+ */
+vector<shared_ptr<Island>> findPeakIslands(GDALDataset &dataset)
 {
   // Get the elevation
-  GDALRasterBand *band = dataset->GetRasterBand(1);
+  GDALRasterBand *band = dataset.GetRasterBand(1);
 
   // Get the size of the raster band
   int width = band->GetXSize();

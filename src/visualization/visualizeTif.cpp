@@ -12,6 +12,25 @@
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkImageFlip.h>
 
+/**
+ * @brief Visualizes a .tif image file using VTK.
+ *
+ * This function reads a .tif file specified by the given path and processes it
+ * using various VTK filters and techniques to visualize the image. It corrects
+ * orientation issues such as flipping and warping of the image. The visualization
+ * is displayed in a render window with interactive camera controls.
+ *
+ * Steps involved:
+ * 1. Read the .tif file using vtkTIFFReader.
+ * 2. Flip the image along the Y-axis to correct upside-down issues.
+ * 3. Convert image data to geometry data for 3D visualization.
+ * 4. Apply a warp scalar filter to correct inverted elevations.
+ * 5. Map the data to a vtkPolyDataMapper and create a vtkActor for rendering.
+ * 6. Render the image in a vtkRenderWindow with interactive controls.
+ *
+ * @param path The file path of the .tif image to be visualized.
+ */
+
 void visualizeTif(std::string path)
 {
 

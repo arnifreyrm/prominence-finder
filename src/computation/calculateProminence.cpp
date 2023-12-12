@@ -12,6 +12,18 @@
 
 using namespace std;
 
+/**
+ * @brief Calculates peak prominences in a dataset using the water level method.
+ *
+ * Processes a geographic dataset to determine the prominence of peaks. Peaks with
+ * prominence below the specified threshold are excluded from the output. The method
+ * simulates lowering water levels to identify and analyze individual islands (peaks).
+ *
+ * @param dataset Unique pointer to the GDALDataset being processed.
+ * @param outputFilePath Path to the output CSV file for storing results.
+ * @param prominenceThreshold Minimum prominence value for peaks to be included in the output.
+ * @param verbose If true, additional details like water level and active island count are printed during processing.
+ */
 void calculateProminence(unique_ptr<GDALDataset> &dataset, const string outputFilePath, int prominenceThreshold = 0, bool verbose = false)
 {
   vector<shared_ptr<Island>> islandPeaks = findPeakIslands(dataset.get());
@@ -26,7 +38,7 @@ void calculateProminence(unique_ptr<GDALDataset> &dataset, const string outputFi
   {
     initializeCSV(outputFilePath);
   }
-
+  // Extract metadata
   auto metaData = matrixData.first;
   vector<vector<Point>> pointMatrix = matrixData.second;
   int height = metaData.height;
@@ -53,7 +65,6 @@ void calculateProminence(unique_ptr<GDALDataset> &dataset, const string outputFi
       shared_ptr<Island> &islandPeak = islandPeaks.back();
       unsigned int islandId = islandPeak->id;
       pointMatrix[islandPeak->peakCoords.y][islandPeak->peakCoords.x].islandId = islandId;
-
       idToIslandMap[islandId] = islandPeak;
       activeIslands.push_back(islandPeak);
       islandPeaks.pop_back();
@@ -145,7 +156,7 @@ void calculateProminence(unique_ptr<GDALDataset> &dataset, const string outputFi
         ++it;
       }
     }
-    // Drain the water level down to the next point
+    // Drain the water level down
     waterLevel -= 1;
   }
   // Append any reamining islands to the file
